@@ -1,10 +1,14 @@
 package networking;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.SocketException;
+
+import javax.swing.JOptionPane;
 
 import main.GamePanel;
 
@@ -15,13 +19,16 @@ public class GameServer extends Thread {
 	
 	public GameServer(GamePanel gp) {
 		this.gp = gp;
+		
 		try {
 			
+			// Pravimo soket za osluskivanje na portu 5000
 			this.socket = new DatagramSocket(5000);
 			
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	public void run() {
