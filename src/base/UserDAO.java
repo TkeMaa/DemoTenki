@@ -147,10 +147,10 @@ public class UserDAO {
             updated = (rowsUpdated > 0);
             
             if(updated) {
-            	System.out.println("Uspesno apdejtovano");
+            	System.out.println("Status uspesno apdejtovan");
             }
             else {
-            	System.out.println("Nije apdejtovano");
+            	System.out.println("Status nije apdejtovan");
             }
             
 

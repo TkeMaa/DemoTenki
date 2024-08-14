@@ -25,7 +25,7 @@ public class Main {
             @Override
             public void windowClosing(WindowEvent e) {
                 if (gamePanel.user != null) {
-                	System.out.println("Logging the user out...");
+                	System.out.println("Logging out the user...");
                 	System.out.println("Username: " + gamePanel.user.getUsername());
                 	if(UserDAO.logoutUser(gamePanel.user.getUsername())) {
                 		System.out.println("User je uspesno odlogovan");

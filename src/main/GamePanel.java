@@ -13,6 +13,7 @@ import java.util.ArrayList;
 //import java.util.Comparator;
 //import java.util.*;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import base.InvitePlayerForm;
@@ -22,6 +23,8 @@ import base.UserDAO;
 import entity.Entity;
 import entity.Player;
 import entity.Projectile;
+import networking.GameClient;
+import networking.GameServer;
 import tile.TileManager;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -86,6 +89,10 @@ public class GamePanel extends JPanel implements Runnable {
 	// UI
 	public UI ui = new UI(this);
 	
+	// Client i Server
+	private GameClient socketClient;
+	private GameServer socketServer;
+	
 	// CONSTRUCTOR
 	public GamePanel() {
 		
@@ -102,6 +109,16 @@ public class GamePanel extends JPanel implements Runnable {
 		gameThread.start();	
 		gameState = titleState;
 		playMusic(Sound.mainMusic);	
+		
+		if(JOptionPane.showConfirmDialog(this, "Da li zelis da pokrenes server?") == 0) {		
+			socketServer = new GameServer(this);
+			socketServer.start();
+		}
+		
+		socketClient = new GameClient(this, "192.168.100.2");
+		socketClient.start();
+		socketClient.sendData("ping".getBytes());
+		
 	}
 	
 	// Najprecizniji nacin
