@@ -58,34 +58,41 @@ public class InvitePlayerForm extends JFrame{
                 			JOptionPane.ERROR_MESSAGE);
         			System.out.println("Igrac sa unetim username-om ne postoji!");
             	} else {
-            		
-            		if(UserDAO.getUser(username).getState() == UserDAO.offline) {
-            			JOptionPane.showMessageDialog(
-                    			null, 
-                    			"Igrac sa unetim username-om je offline!", 
-                    			"Message", 
-                    			JOptionPane.ERROR_MESSAGE);
-            			System.out.println("Igrac sa unetim username-om je offline!");
-            		} 
+            		// Igrac ne moze da pozove samog sebe
+            		if (!username.equals(gp.user.getUsername())) {
+            			System.out.println("Username pozvanog igraca: " + invitedPlayer.getText());
+            			System.out.println("Uslo se u if, username user-a: " + gp.user.getUsername());
+            			if(UserDAO.getUser(username).getState() == UserDAO.offline) {
+                			JOptionPane.showMessageDialog(
+                        			null, 
+                        			"Igrac sa unetim username-om je offline!", 
+                        			"Message", 
+                        			JOptionPane.ERROR_MESSAGE);
+                			System.out.println("Igrac sa unetim username-om je offline!");
+                		} 
 
-            		if(UserDAO.getUser(username).getState() == UserDAO.inGame) {
-            			JOptionPane.showMessageDialog(
-                    			null, 
-                    			"Igrac sa unetim username-om je u game-u!", 
-                    			"Message", 
-                    			JOptionPane.ERROR_MESSAGE);
-            			System.out.println("Igrac sa unetim username-om je u game-u!");
-            		} 
-            		
-            		if(UserDAO.getUser(username).getState() == UserDAO.online) {
-            			// POSLATI PORUKU DRUGOM IGRACU
-            			System.out.println("Igrac je pozvan!");
-            		} 
-            		
-            	}
+                		if(UserDAO.getUser(username).getState() == UserDAO.inGame) {
+                			JOptionPane.showMessageDialog(
+                        			null, 
+                        			"Igrac sa unetim username-om je u game-u!", 
+                        			"Message", 
+                        			JOptionPane.ERROR_MESSAGE);
+                			System.out.println("Igrac sa unetim username-om je u game-u!");
+                		} 
                 		
+                		if(UserDAO.getUser(username).getState() == UserDAO.online) {
+                			// POSLATI PORUKU DRUGOM IGRACU
+                			JOptionPane.showMessageDialog(
+                        			null, 
+                        			"Igrac (" + username + ") je pozvan u borbu!", 
+                        			"Message", 
+                        			JOptionPane.INFORMATION_MESSAGE);
+                			System.out.println("Igrac je pozvan!");
+                		}
+            		} 
+            	}
+            
             }
-                
         });
 
         getContentPane().add(panel, BorderLayout.CENTER);

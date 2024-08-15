@@ -78,7 +78,7 @@ public class UserDAO {
 	public void addUser() {
 		
         if (username != null && hashedPassword != null && state != -1) {
-        	String query = "INSERT INTO sys.user (username, password, state) VALUES (?, ?, ?)";
+        	String query = "INSERT INTO user (username, password, state) VALUES (?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -102,7 +102,7 @@ public class UserDAO {
     }
 	
 	public static UserDAO getUser(String username) {
-		String query = "SELECT username, password, state FROM sys.user WHERE username = ?";
+		String query = "SELECT username, password, state FROM user WHERE username = ?";
         UserDAO user = null;
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -134,7 +134,7 @@ public class UserDAO {
 	}
 
 	public static boolean updateUserState(String username, int newState) {
-		String query = "UPDATE sys.user SET state = ? WHERE username = ?";
+		String query = "UPDATE user SET state = ? WHERE username = ?";
         boolean updated = false;
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -169,7 +169,7 @@ public class UserDAO {
 	}
 	
 	public static LinkedList<String> getOnlineUsers() {
-		String query = "SELECT username FROM sys.user WHERE state = ?";
+		String query = "SELECT username FROM user WHERE state = ?";
 		LinkedList<String> usernames = new LinkedList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
