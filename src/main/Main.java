@@ -2,11 +2,14 @@ package main;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 //import java.awt.Image;
 //import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import base.DatabaseConnection;
 import base.UserDAO;
 
 public class Main {
@@ -15,6 +18,17 @@ public class Main {
 		
 		JFrame window = new JFrame();
 		GamePanel gamePanel = new GamePanel();
+		
+		// Provera konekcije
+		try {
+			Connection conn = DatabaseConnection.getConnection();
+			if (conn != null) {
+				System.out.println("Konekcija sa bazom uspesno uspostavljena.");
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		// Odloguj korisnika prilikom gasenja 
 		window.addWindowListener(new WindowAdapter() {
