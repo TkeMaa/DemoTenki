@@ -123,8 +123,13 @@ public class KeyHandler implements KeyListener{
 				// EXIT
 				if (gp.ui.commandNum == 2) {
                     if (gp.user != null) {
-                        System.out.println("Logging out the user...");
-                    	UserDAO.logoutUser(gp.user.getUsername());;
+                    	System.out.println("Logging out the user...");
+                    	if(UserDAO.logoutUser(gp.user.getUsername())) {
+                    		System.out.println("User je uspesno odlogovan!");
+                    	}
+                    	else {
+                    		System.out.println("User nije odlogovan!");
+                    	}
                     }
                     System.exit(0);
                 }

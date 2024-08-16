@@ -63,7 +63,22 @@ public class Main {
 		window.setLocationRelativeTo(null); //Prozor ce biti postavljen u centar ekrana
 		window.setVisible(true);
 		
-		gamePanel.startGameThread();
+		// Odloguj korisnika ako se dogodi neka greska
+		try {
+			gamePanel.startGameThread();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			System.out.println("Logging out the user...");
+        	System.out.println("Username: " + gamePanel.user.getUsername());
+        	if(UserDAO.logoutUser(gamePanel.user.getUsername())) {
+        		System.out.println("User je uspesno odlogovan");
+        	}
+        	else {
+        		System.out.println("User nije odlogovan");
+        	}
+        	window.dispose(); 
+        	System.exit(0);
+		}
 	}
 	
 }
