@@ -6,12 +6,12 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-	private static final String host = "192.168.100.2";
-	private static final String dbName = "sakila";
+	private static final String host = "sql7.freesqldatabase.com";
+	private static final String dbName = "sql7726250";
 	
 	private static final String url = "jdbc:mysql://" + host + ":3306/" + dbName;
-	private static final String user = "remote_user";
-	private static final String password = "password";
+	private static final String user = "sql7726250";
+	private static final String password = "NhmlgxDYcx";
 	
 	public static Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(url, user, password);
