@@ -61,10 +61,13 @@ public class LoginForm extends JFrame {
 	                		}
 	                		gp.user = new UserDAO(username, password, UserDAO.online);
 	                		System.out.println("Paket u loginForm: " + gp.user.toString());
-	                		gp.socketClient.sendData(GameServer.loginPacket, gp.user.toString());
 	                		
-	                		// Tranzicija u playState
+	                		// Prosledjujemo username, ip, port se dobija na serveru:
+	                		gp.socketClient.sendDataToServer(GameServer.loginPacket, gp.user.toString());
+	                		
+	                		// Tranzicija u playState:
 	                		gp.gameState = GamePanel.playState;
+	                		
 	                		gp.loginForm = null;
 	                		dispose();
 	                	} else {

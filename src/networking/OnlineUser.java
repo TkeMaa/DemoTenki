@@ -4,6 +4,7 @@ public class OnlineUser {
 	
 	private String username;
 	private String ipAddress;
+	private int port;
 	
 	public OnlineUser(String username, String ipAddress) {
 		setUsername(username);
@@ -21,6 +22,12 @@ public class OnlineUser {
 	}
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
+	}
+	public int getPort() {
+		return port;
+	}
+	public void setPort(int port) {
+		this.port = port;
 	}
 	
 }

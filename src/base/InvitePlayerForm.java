@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import main.GamePanel;
+import networking.GameServer;
 
 public class InvitePlayerForm extends JFrame{
 	
@@ -78,14 +79,27 @@ public class InvitePlayerForm extends JFrame{
                 			System.out.println("Igrac sa unetim username-om je u game-u!");
                 		} 
                 		
-                		if(UserDAO.getUser(username).getState() == UserDAO.online) {
-                			// POSLATI PORUKU DRUGOM IGRACU
+                		if(UserDAO.getUser(username).getState() == UserDAO.inWaitingRoom) {
                 			JOptionPane.showMessageDialog(
                         			null, 
-                        			"Igrac (" + username + ") je pozvan u borbu!", 
+                        			"Igrac sa unetim username-om ceka na borbu!", 
                         			"Message", 
-                        			JOptionPane.INFORMATION_MESSAGE);
+                        			JOptionPane.ERROR_MESSAGE);
+                			System.out.println("Igrac sa unetim username-om ceka na borbu!");
+                		} 
+                		
+                		// POZIV U BORBU
+                		if(UserDAO.getUser(username).getState() == UserDAO.online) {
                 			System.out.println("Igrac je pozvan!");
+                			// POSLATI PORUKU DRUGOM IGRACU
+                			// invitePacket - 02:usernameInvited:usernameInviteFrom
+	                		gp.socketClient.sendDataToServer(GameServer.invitePacket, username + ":" + gp.user.getUsername());
+	                		// PROMENITI GAMESTATE NA inWaitingRoom
+	                		gp.user.setState(UserDAO.inWaitingRoom);
+	                		UserDAO.updateUserState(gp.user.getUsername(), UserDAO.inWaitingRoom);
+	                		
+	                		gp.invitePlayerForm = null;
+	                		dispose();
                 		}
             		} 
             	}
@@ -99,7 +113,7 @@ public class InvitePlayerForm extends JFrame{
         setLocationRelativeTo(null); 
         setVisible(true);
         
-        // Postavi atribut "signupForm" gp-a na null prilikom gasenja sign-up forme
+        // Postavi atribut "invitePlayForm" gp-a na null prilikom gasenja sign-up forme
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

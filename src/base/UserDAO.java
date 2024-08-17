@@ -13,7 +13,7 @@ public class UserDAO {
 	public static int online = 0;
 	public static int offline = 1;
 	public static int inGame = 2;
-	public static int inLobby = 3;
+	public static int inWaitingRoom = 3;
 	
 	private String username = null;
 	private String hashedPassword = null;
@@ -84,7 +84,7 @@ public class UserDAO {
 	}
 	
 	public void setState(int state) {
-		if (state >= 0 && state <= 3) {
+		if (state >= 0 && state <= 5) {
 			this.state = state;
 			System.out.println("Status uspesno unet!");
 		} else {
@@ -164,7 +164,7 @@ public class UserDAO {
             updated = (rowsUpdated > 0);
             
             if(updated) {
-            	System.out.println("Status uspesno apdejtovan");
+            	System.out.println("Status uspesno apdejtovan: " + newState);
             }
             else {
             	System.out.println("Status nije apdejtovan");

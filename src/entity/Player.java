@@ -202,5 +202,10 @@ public void draw(Graphics2D g2) {
 				break;
 		}
 	}
+
+	public void setDefaultCoordinates(int row, int col) {
+		this.worldX = row * GamePanel.tileSize;
+		this.worldY = col * GamePanel.tileSize;
+	}
 	
 }

@@ -99,6 +99,7 @@ public class GamePanel extends JPanel implements Runnable {
 	
 	// Adresa i port serverskog rutera:
 	private static int serverPort = 12345; 
+	private static int battlePort = 12346;
 	private static String serverAddress = "79.175.76.229";
 	
 	// URL za proveru javne ip adrese
@@ -158,9 +159,9 @@ public class GamePanel extends JPanel implements Runnable {
 			System.out.println("Niste u mogucnosti da pokrenete server na vasem racunaru.");
 		}
 		
-		socketClient = new GameClient(this, serverAddress, serverPort);
+		socketClient = new GameClient(this, serverAddress, serverPort, battlePort);
 		socketClient.start();
-		socketClient.sendData(GameServer.testPacket,"ping");
+		socketClient.sendDataToServer(GameServer.testPacket,"ping");
 	}
 	
 	// Najprecizniji nacin
