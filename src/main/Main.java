@@ -16,21 +16,21 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
+		// NAPOMENA: Gasiti na X ili na EXIT opciju!
 		JFrame window = new JFrame();
 		GamePanel gamePanel = new GamePanel();
 		
-		// Provera konekcije
-		try {
-			Connection conn = DatabaseConnection.getConnection();
+		// Provera konekcije na bazu
+		try (Connection conn = DatabaseConnection.getConnection()) {
 			if (conn != null) {
 				System.out.println("Konekcija sa bazom uspesno uspostavljena.");
 			}
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
-		// Odloguj korisnika prilikom gasenja 
+		// TODO: Omoguciti da se korisnik odloguje nasilnim gasenjem aplikacije, na terminate
+		// Odloguj korisnika prilikom gasenja JFrame-a
 		window.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -48,6 +48,7 @@ public class Main {
                 }
             }
 		});
+		// TODO: Dodati ikonicu na window!
 //		ImageIcon icon = new ImageIcon("/player/plavi_gore1.png");
 //		Image iconImage = (BufferedImage) icon.getImage();
 		
@@ -60,24 +61,26 @@ public class Main {
 
 //		window.setIconImage(iconImage);
 		
-		window.setLocationRelativeTo(null); //Prozor ce biti postavljen u centar ekrana
+		window.setLocationRelativeTo(null); // Prozor ce biti postavljen u centar ekrana
 		window.setVisible(true);
 		
-		// Odloguj korisnika ako se dogodi neka greska
+		// Odloguj korisnika ako se dogodi neka greska (ne bi trebalo ovde da hvata)
 		try {
 			gamePanel.startGameThread();
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			System.out.println("Logging out the user...");
-        	System.out.println("Username: " + gamePanel.user.getUsername());
-        	if(UserDAO.logoutUser(gamePanel.user.getUsername())) {
-        		System.out.println("User je uspesno odlogovan");
-        	}
-        	else {
-        		System.out.println("User nije odlogovan");
-        	}
-        	window.dispose(); 
-        	System.exit(0);
+			if (gamePanel.user != null) {
+				System.out.println("Logging out the user...");
+	        	System.out.println("Username: " + gamePanel.user.getUsername());
+	        	if(UserDAO.logoutUser(gamePanel.user.getUsername())) {
+	        		System.out.println("User je uspesno odlogovan");
+	        	}
+	        	else {
+	        		System.out.println("User nije odlogovan");
+	        	}
+	        	window.dispose(); 
+	        	System.exit(0);
+			}
 		}
 	}
 	

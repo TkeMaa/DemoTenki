@@ -1,7 +1,6 @@
 package base;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,11 +29,10 @@ public class InvitePlayerForm extends JFrame{
 		
     this.setResizable(false);
     	
-    	setTitle("Invite player into battle");
+    	setTitle("Invite");
     	
         JPanel panel= new JPanel();
-        panel.setLayout(new GridLayout(18,1));
-        panel.setPreferredSize(new Dimension(400, 350));
+        panel.setLayout(new GridLayout(3,1));
         
         panel.add(new JLabel("Unesite username igraca:"));
         invitedPlayer = new JTextField(20);

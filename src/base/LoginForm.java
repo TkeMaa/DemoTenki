@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 import main.GamePanel;
+import networking.GameServer;
 
 public class LoginForm extends JFrame {
 
@@ -52,14 +53,15 @@ public class LoginForm extends JFrame {
                 if (!Utility.usernameIsAvaliable(username)) {
                 	if (Utility.usernameMatchesPassword(username, password)) {
 	                	if (UserDAO.getUser(username).getState() == UserDAO.offline) {	
-                			// Log-inujemo korisnika u bazi
+                			// Log-inujemo korisnika u bazi i saljemo login paket serveru
 	                		if(UserDAO.loginUser(username)){
-	                			System.out.println("Ulogovan");
+	                			System.out.println("Baza: Ulogovan");
 	                		} else {
-	                			System.out.println("Nije Ulogovan");
+	                			System.out.println("Baza: Nije Ulogovan");
 	                		}
 	                		gp.user = new UserDAO(username, password, UserDAO.online);
-	                		System.out.println("Uspesno ste se ulogovali!");
+	                		System.out.println("Paket u loginForm: " + gp.user.toString());
+	                		gp.socketClient.sendData(GameServer.loginPacket, gp.user.toString());
 	                		
 	                		// Tranzicija u playState
 	                		gp.gameState = GamePanel.playState;

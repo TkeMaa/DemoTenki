@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
+import main.GamePanel;
+
 public class UserDAO {
 
 	public static int online = 0;
@@ -15,6 +17,7 @@ public class UserDAO {
 	
 	private String username = null;
 	private String hashedPassword = null;
+	private String ipAddress = null;
 	private int state = -1;
 	
 	// Privatni default konstruktor za povlacenje podataka iz baze
@@ -26,6 +29,7 @@ public class UserDAO {
 		setUsername(username);
 		hashAndSetPassword(password);
 		setState(state);
+		setIpAddress();
 	}
 	
 	public String getUsername() {
@@ -34,6 +38,10 @@ public class UserDAO {
 	
 	public String getHashedPassword() {
 		return hashedPassword;
+	}
+	
+	public String getIpAddress() {
+		return ipAddress;
 	}
 	
 	public int getState() {
@@ -64,6 +72,15 @@ public class UserDAO {
 	private void setHashedPassword(String password) {
 		this.hashedPassword = Utility.hashPassword(password);
 		System.out.println("Password uspesno unet!");
+	}
+	
+	public void setIpAddress() {
+		String ip = GamePanel.getPublicIp();
+		if (ip == null) {
+			System.out.println("Greska u povlacenju javne ip adrese: ip = null");
+			return;
+		}
+		this.ipAddress = ip;
 	}
 	
 	public void setState(int state) {
@@ -193,7 +210,7 @@ public class UserDAO {
 	
 	@Override
 	public String toString() {
-		return String.format("UserDAO [username=%s, hashedPassword=%s, state=%s]", username, hashedPassword, state);
+		return username + ":" + ipAddress;
 	}
 
 }

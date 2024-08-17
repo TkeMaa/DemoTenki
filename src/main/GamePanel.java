@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 //import java.util.concurrent.Executors;
 //import java.util.concurrent.ScheduledExecutorService;
 //import java.util.concurrent.TimeUnit;
@@ -50,7 +53,6 @@ public class GamePanel extends JPanel implements Runnable {
 	
 	// USER
 	public UserDAO user = null;
-	//public List<String> onlineUsers = null;
 	
 	// WORLD SETTINGS
 	public final int maxWorldCols = 35; // Maks broj kolona mape
@@ -91,9 +93,16 @@ public class GamePanel extends JPanel implements Runnable {
 	// UI
 	public UI ui = new UI(this);
 	
-	// Client i Server
-	private GameClient socketClient;
-	private GameServer socketServer;
+	// Client i Server - Server moze biti pokrenut samo na racunaru cija je javna ip adresa: sendAddress
+	public GameClient socketClient;
+	public GameServer socketServer;
+	
+	// Adresa i port serverskog rutera:
+	private static int serverPort = 12345; 
+	private static String serverAddress = "79.175.76.229";
+	
+	// URL za proveru javne ip adrese
+	private static final String checkPublicIpString = "http://checkip.amazonaws.com/";
 	
 	// CONSTRUCTOR
 	public GamePanel() {
@@ -105,6 +114,33 @@ public class GamePanel extends JPanel implements Runnable {
 		this.setFocusable(true); // Ovo mora da bi moglo da primi input sa tastature
 	}
 
+	public static String getPublicIp(){
+		URL url = null;
+		String ip;
+		try {
+			url = new URL(checkPublicIpString);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()))) {
+		    ip = br.readLine();
+		    System.out.println("Vasa javna ipv4 adresa: " + ip.trim());
+			return ip;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	// Server moze biti pokrenut samo na racunaru cija je javna ip adresa: sendAddress
+	private boolean serverRunnable() {
+		String ip = getPublicIp();
+		if (ip == null) {
+			return false;
+		}
+		return ip.equals(serverAddress);
+	}
+	
 	public void startGameThread() {
 				
 		gameThread = new Thread(this);
@@ -112,15 +148,19 @@ public class GamePanel extends JPanel implements Runnable {
 		gameState = titleState;
 		playMusic(Sound.mainMusic);	
 		
-		if(JOptionPane.showConfirmDialog(this, "Da li zelis da pokrenes server?") == 0) {		
-			socketServer = new GameServer(this);
-			socketServer.start();
+		if (serverRunnable()) {
+			if (JOptionPane.showConfirmDialog(this, "Da li zelis da pokrenes server?") == 0) {
+				socketServer = new GameServer(this);
+	            socketServer.start();
+	            System.out.println("Server uspesno pokrenut");
+			}
+		} else {
+			System.out.println("Niste u mogucnosti da pokrenete server na vasem racunaru.");
 		}
 		
-		socketClient = new GameClient(this, "192.168.100.2");
+		socketClient = new GameClient(this, serverAddress, serverPort);
 		socketClient.start();
-		socketClient.sendData("ping".getBytes());
-		
+		socketClient.sendData(GameServer.testPacket,"ping");
 	}
 	
 	// Najprecizniji nacin

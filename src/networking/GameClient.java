@@ -11,16 +11,21 @@ import main.GamePanel;
 
 public class GameClient extends Thread {
 
-	private InetAddress ipAdress;
+	// 12345 - port serverskog rutera za slusanje udp paketa
+	private int serverPort;
+	// 79.175.76.229 - ip adresa serverskog rutera
+	private InetAddress serverAddress;
+	
 	private DatagramSocket socket;
 	private GamePanel gp;
 	
-	public GameClient(GamePanel gp, String ipAddress) {
+	public GameClient(GamePanel gp, String serverAddress, int serverPort) {
 		this.gp = gp;
+		this.serverPort = serverPort;
 		try {
 			
 			this.socket = new DatagramSocket();
-			this.ipAdress = InetAddress.getByName(ipAddress);
+			this.serverAddress = InetAddress.getByName(serverAddress);
 			
 		} catch (SocketException e) {
 			e.printStackTrace();
@@ -44,8 +49,10 @@ public class GameClient extends Thread {
 		}
 	}
 	
-	public void sendData(byte[] data) {
-		DatagramPacket packet = new DatagramPacket(data, data.length, ipAdress, 5000);
+	public void sendData(String packetType, String data) {
+		String dataPacket = packetType + ":" + data;
+		DatagramPacket packet = new DatagramPacket(dataPacket.getBytes(), dataPacket.length(), serverAddress, serverPort);
+		System.out.println("Paket u sendData-gameClient: " + dataPacket);
 		try {
 			socket.send(packet);
 		} catch (IOException e) {
