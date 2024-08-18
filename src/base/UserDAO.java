@@ -198,7 +198,7 @@ public class UserDAO {
 
             while (resultSet.next()) {
                 String username = resultSet.getString("username");
-                usernames.add(username); 
+                usernames.add(username);
             }
 
         } catch (SQLException e) {

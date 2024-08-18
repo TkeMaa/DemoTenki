@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import javax.swing.JOptionPane;
 
 import base.UserDAO;
+import entity.EnemyPlayer;
 import main.GamePanel;
 import main.Sound;
 
@@ -60,12 +61,53 @@ public class GameClient extends Thread {
 			// Packet format - XX:data
 			//                 012
 			String packetType = message.substring(0,2);
-			String dataString = message.substring(3);
+			String dataString = message.substring(3).trim();
 			
 			String packetIp = packet.getAddress().getHostAddress();
 			int packetPort = packet.getPort();
 			
 			switch (packetType) {
+				
+				case GameServer.changeDirectionPacket: {
+					System.out.println("Primljen paket: " + message);
+					if (dataString.trim().equalsIgnoreCase(GameServer.upDir)) {
+						gp.enemy.direction = "up";
+					}
+					if (dataString.trim().equalsIgnoreCase(GameServer.downDir)) {
+						gp.enemy.direction = "left";
+					}
+					if (dataString.trim().equalsIgnoreCase(GameServer.leftDir)) {
+						gp.enemy.direction = "right";
+					}
+					if (dataString.trim().equalsIgnoreCase(GameServer.rightDir)) {
+						gp.enemy.direction = "down";
+					}
+					break;
+				}
+				case GameServer.movePacket: {
+					System.out.println("Primljen paket: " + message);
+					if (dataString.trim().equalsIgnoreCase(GameServer.movedUp)) {
+						gp.enemy.worldY -= gp.enemy.speed;
+					}
+					if (dataString.trim().equalsIgnoreCase(GameServer.movedDown)) {
+						gp.enemy.worldY += gp.enemy.speed;
+					}
+					if (dataString.trim().equalsIgnoreCase(GameServer.movedLeft)) {
+						gp.enemy.worldX -= gp.enemy.speed;
+					}
+					if (dataString.trim().equalsIgnoreCase(GameServer.movedRight)) {
+						gp.enemy.worldX += gp.enemy.speed;
+					}
+					break;
+				}
+//				case GameServer.stopPacket: {
+//					gp.enemy.moved_up = false;
+//					gp.enemy.moved_down = false;
+//					gp.enemy.moved_left = false;
+//					gp.enemy.moved_right = false;
+//					break;
+//				}
+				
 				case GameServer.testPacket: {
 					System.out.println("SERVER [" + packetIp + ":" + packetPort + "] > " + dataString);
 					break;
@@ -126,12 +168,21 @@ public class GameClient extends Thread {
 					break;
 				}
 				case GameServer.setInBattleRowColsPacket: {
+					
 					String[] rowColInfo = dataString.split(":");
 					System.out.println();
 					int row = Integer.parseInt(rowColInfo[0].trim());
 					int col = Integer.parseInt(rowColInfo[1].trim());
 					gp.player.setDefaultCoordinates(row, col);
-					// Promeni gameState
+					gp.enemy = new EnemyPlayer(gp);
+					if(row == 1) {
+						gp.enemy.worldX = 33 * GamePanel.tileSize;
+						gp.enemy.worldY = 33 * GamePanel.tileSize;
+					} else {
+						gp.enemy.worldX = 1 * GamePanel.tileSize;
+						gp.enemy.worldY = 1 * GamePanel.tileSize;
+					}
+					
 					gp.stopMusic();
 					gp.playMusic(Sound.battleMusic);
 					gp.gameState = GamePanel.inGameState;

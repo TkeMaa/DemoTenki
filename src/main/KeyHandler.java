@@ -7,6 +7,7 @@ import base.InvitePlayerForm;
 import base.LoginForm;
 import base.SignupForm;
 import base.UserDAO;
+import networking.GameServer;
 
 public class KeyHandler implements KeyListener{
 	
@@ -142,6 +143,8 @@ public class KeyHandler implements KeyListener{
 	@Override
 	public void keyReleased(KeyEvent e) {
 
+		gp.socketClient.sendDataToBattleThread(GameServer.movePacket, GameServer.stop);
+		
 		int code = e.getKeyCode();
 		
 		if(code == KeyEvent.VK_W) {

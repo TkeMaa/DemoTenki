@@ -20,6 +20,12 @@ public class BattleThread extends Thread {
 		this.player2 = player2;
 		this.gameServer = gameServer;
 		
+		try {
+			this.serverSocket = new DatagramSocket(5001);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		
 		gameServer.sendData(GameServer.setInBattleRowColsPacket, GameServer.player1Coordinates, player1.getIpAddress(), player1.getPort());
 		gameServer.sendData(GameServer.setInBattleRowColsPacket, GameServer.player2Coordinates, player2.getIpAddress(), player2.getPort());
 	}
@@ -27,18 +33,55 @@ public class BattleThread extends Thread {
 	@Override
 	public void run() {
 		
-		long timer = 0;
-		long lastTime = System.currentTimeMillis();	
-		
 		while (true) {
-			
-			long currTime = System.currentTimeMillis();
-			timer += (currTime - lastTime);
-			if (timer >= 3000000) {
-				System.out.println("Battle thread is running...");
-				timer = 0;
+			byte[] data = new byte[1024];
+			DatagramPacket packet = new DatagramPacket(data, data.length);
+			try {
+				serverSocket.receive(packet);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			lastTime = currTime;
+			
+			String message = new String(packet.getData());
+			// Packet format - XX:data
+			//                 012
+			String packetType = message.substring(0,2);
+			String dataString = message.substring(3);
+			
+			String packetIp = packet.getAddress().getHostAddress();
+			int packetPort = packet.getPort();
+			
+			String destIp = null;
+			int destPort = 0;
+			
+			if (packetPort == player1.getPort()) {
+				destPort = player2.getPort();
+			} else {
+				destPort = player1.getPort();
+			}
+			
+			if (packetIp.trim().equalsIgnoreCase(player1.getIpAddress().trim())) {
+				destIp = player2.getIpAddress().trim();
+			} else {
+				destIp = player1.getIpAddress().trim();
+			}
+			
+			// Proveravamo prve dve cifre primljenog paketa kako bismo utvrdili njegov tip
+			switch (packetType) {
+				case GameServer.changeDirectionPacket: {
+					sendData(GameServer.changeDirectionPacket, dataString.trim(), destIp, destPort);
+					break;	
+				}
+				case GameServer.movePacket: {
+					sendData(GameServer.movePacket, dataString.trim(), destIp, destPort);
+					break;
+				}
+				case GameServer.stopPacket: {
+					sendData(GameServer.stopPacket, dataString.trim(), destIp, packetPort);
+					break;
+				}
+			}
+			
 		}
 		
 	}
@@ -62,7 +105,7 @@ public class BattleThread extends Thread {
 		byte[] dataByte = dataString.getBytes();
 		
 		DatagramPacket packet = new DatagramPacket(dataByte, dataByte.length, inetAddress, userPort);
-		System.out.println("Paket u sendData-gameClient: " + dataString);
+		System.out.println("Paket u sendData-battleThread: " + dataString);
 		try {
 			socket.send(packet);
 		} catch (IOException e) {

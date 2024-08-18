@@ -9,8 +9,6 @@ import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import main.GamePanel;
 
 public class GameServer extends Thread {
@@ -31,7 +29,22 @@ public class GameServer extends Thread {
 	public static final String setInBattleRowColsPacket = "06";
 		public static final String player1Coordinates = "1:1";
 		public static final String player2Coordinates = "33:33";
+		
+	public static final String changeDirectionPacket = "07"; // 07:dir
+		public static final String upDir = "up"; 
+		public static final String downDir = "down";
+		public static final String leftDir = "left";
+		public static final String rightDir = "right";
 	
+	public static final String movePacket = "08";	// 08:mov
+		public static final String movedUp = "up";
+		public static final String movedDown = "down";
+		public static final String movedLeft = "left";
+		public static final String movedRight = "right";
+		
+	public static final String stopPacket = "09";
+		public static final String stop = "stop";
+		
 	private DatagramSocket socket;
 	private GamePanel gp;
 	private final int portNum = 5000;

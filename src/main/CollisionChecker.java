@@ -11,6 +11,12 @@ public class CollisionChecker {
 		this.gp = gp;
 	}
 	
+	// Proveri koliziju sa enemy igracem
+	public boolean checkEnemyCollision(Entity entity) {
+		return false;
+		
+	}
+	
 	public int[] checkTile(Entity entity) {
 		
 		// SOLID AREA GRANICE ZA ENTITY:

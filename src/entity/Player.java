@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import main.GamePanel;
 import main.KeyHandler;
 import main.Sound;
+import networking.GameServer;
 import tile.TileManager;
 
 public class Player extends Entity{
@@ -70,7 +71,8 @@ public class Player extends Entity{
 		right2 = setup("/player/plavi_desno2");
 	}
 	
-public void draw(Graphics2D g2) {
+	@Override
+	public void draw(Graphics2D g2) {
 		
 		BufferedImage image = null;
 		
@@ -124,9 +126,8 @@ public void draw(Graphics2D g2) {
 		g2.drawImage(image, screenX, screenY, null);
 	}
 	
-	
+	@Override
 	public void update() {	
-		
 		// OVAJ IF MORA KAKO SE IGRAC NE BI KRETAO SAM OD SEBE NAKON JEDNOG PRITISKA DUGMETA, KAO I NA SAMOM POCETKU IGRE,
 		// SOBZIROM DA JE DEFAULT POZICIJA "DOLE".
 		// IGRAC SE POMERA SAMO U KOLIKO SE KONTINUALNO PRITISKAJU DUGMICI
@@ -144,6 +145,9 @@ public void draw(Graphics2D g2) {
 			else if(keyH.rightPressed) {
 				direction = "right";
 			}
+			// Posalji na battleThread smer
+			gp.socketClient.sendDataToBattleThread(GameServer.changeDirectionPacket, direction);
+			
 			// Animacija
 			spriteNum++;
 			if (spriteNum > 2) {
@@ -156,6 +160,7 @@ public void draw(Graphics2D g2) {
 			
 			// Ako nema kolizije u odredjenom smeru, igrac moze da se krece 
 			if (!collisionOn) {
+				gp.socketClient.sendDataToBattleThread(GameServer.movePacket, direction);
 				switch (direction) {
 				case "up":
 					worldY -= speed;

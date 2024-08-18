@@ -25,6 +25,7 @@ import base.InvitePlayerForm;
 import base.LoginForm;
 import base.SignupForm;
 import base.UserDAO;
+import entity.EnemyPlayer;
 import entity.Entity;
 import entity.Player;
 import entity.Projectile;
@@ -67,8 +68,9 @@ public class GamePanel extends JPanel implements Runnable {
 	// GAME THREAD
 	public Thread gameThread;
 	
-	// PLAYER
+	// PLAYER & ENEMY
 	public Player player = new Player(this, keyH);
+	public EnemyPlayer enemy;
 	
 	// ENTITY LIST, PROJECTILE LIST
 	public ArrayList<Projectile> projectileList = new ArrayList<>();
@@ -287,6 +289,10 @@ public class GamePanel extends JPanel implements Runnable {
 		case inGameState:
 			// PLAYER UPDATE
 			player.update();
+			// ENEMY UPDATE
+			if (enemy != null) {
+				enemy.update(); 
+			}
 			// PROJECTILE UPDATE
 			projectileUpdate();
 			break;
@@ -320,6 +326,10 @@ public class GamePanel extends JPanel implements Runnable {
 			// Dodajemo sve entitete u entityList:
 			// IGRAC
 			entityList.add(player);
+			// ENEMY
+			if (enemy != null) {
+				entityList.add(enemy);
+			}
 			// PROJEKTILI
 			for (int i = 0; i < projectileList.size();i++) {
 				if (projectileList.get(i) != null) {
