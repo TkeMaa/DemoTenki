@@ -29,6 +29,7 @@ public class Main {
 			e1.printStackTrace();
 		}
 		
+		// TODO: Ukloni korisnika iz liste na serveru
 		// TODO: Omoguciti da se korisnik odloguje nasilnim gasenjem aplikacije, na terminate
 		// Odloguj korisnika prilikom gasenja JFrame-a
 		window.addWindowListener(new WindowAdapter() {
@@ -64,6 +65,7 @@ public class Main {
 		window.setLocationRelativeTo(null); // Prozor ce biti postavljen u centar ekrana
 		window.setVisible(true);
 		
+		// TODO: Ukloni korisnika iz liste na serveru
 		// Odloguj korisnika ako se dogodi neka greska (ne bi trebalo ovde da hvata)
 		try {
 			gamePanel.startGameThread();

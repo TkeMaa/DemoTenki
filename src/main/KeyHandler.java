@@ -57,6 +57,7 @@ public class KeyHandler implements KeyListener{
 				if (gp.ui.commandNum == 1 && gp.loginForm == null && gp.signupForm == null) {
 					gp.signupForm = new SignupForm(gp);
 				}
+				// TODO: Ukloni korisnika iz liste na serveru
 				// EXIT
 				if (gp.ui.commandNum == 2) {
                     if (gp.user != null) {
@@ -121,6 +122,7 @@ public class KeyHandler implements KeyListener{
 				if (gp.ui.commandNum == 1 && gp.invitePlayerForm == null) {
 					gp.invitePlayerForm = new InvitePlayerForm(gp);
 				}
+				// TODO: Ukloni korisnika iz liste na serveru
 				// EXIT
 				if (gp.ui.commandNum == 2) {
                     if (gp.user != null) {
@@ -142,8 +144,6 @@ public class KeyHandler implements KeyListener{
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-
-		gp.socketClient.sendDataToBattleThread(GameServer.movePacket, GameServer.stop);
 		
 		int code = e.getKeyCode();
 		

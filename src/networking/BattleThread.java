@@ -66,6 +66,8 @@ public class BattleThread extends Thread {
 				destIp = player1.getIpAddress().trim();
 			}
 			
+			System.out.println("Packet received from: " + packetIp + "|" + packetPort);
+			
 			// Proveravamo prve dve cifre primljenog paketa kako bismo utvrdili njegov tip
 			switch (packetType) {
 				case GameServer.changeDirectionPacket: {
@@ -74,10 +76,6 @@ public class BattleThread extends Thread {
 				}
 				case GameServer.movePacket: {
 					sendData(GameServer.movePacket, dataString.trim(), destIp, destPort);
-					break;
-				}
-				case GameServer.stopPacket: {
-					sendData(GameServer.stopPacket, dataString.trim(), destIp, packetPort);
 					break;
 				}
 			}
@@ -106,6 +104,7 @@ public class BattleThread extends Thread {
 		
 		DatagramPacket packet = new DatagramPacket(dataByte, dataByte.length, inetAddress, userPort);
 		System.out.println("Paket u sendData-battleThread: " + dataString);
+		System.out.println("Sending data to: " + inetAddress.getHostAddress() + "|" + userPort);
 		try {
 			socket.send(packet);
 		} catch (IOException e) {

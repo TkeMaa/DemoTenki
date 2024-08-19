@@ -42,8 +42,8 @@ public class GameServer extends Thread {
 		public static final String movedLeft = "left";
 		public static final String movedRight = "right";
 		
-	public static final String stopPacket = "09";
-		public static final String stop = "stop";
+//	public static final String stopPacket = "09";
+//		public static final String stop = "stop";
 		
 	private DatagramSocket socket;
 	private GamePanel gp;
@@ -80,6 +80,7 @@ public class GameServer extends Thread {
 		}
 	}
 	
+	// TODO: Promeniti u TCP
 	public void run() {
 		
 		// Receive data
@@ -167,7 +168,7 @@ public class GameServer extends Thread {
 						BattleThread battleThread = new BattleThread(getOnlineUserByUsername(responseTo), getOnlineUserByUsername(responseFrom), this);
 						battleThread.start();
 					}
-					
+					break;
 				}
 				
 			}

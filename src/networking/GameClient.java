@@ -56,8 +56,8 @@ public class GameClient extends Thread {
 				e.printStackTrace();
 			}
 			
-			String message = new String(packet.getData());
-			System.out.println("Primljeni paket: " + message);
+			String message = (new String(packet.getData())).trim();
+			System.out.println("Primljeni paket: " + message + "+");
 			// Packet format - XX:data
 			//                 012
 			String packetType = message.substring(0,2);
