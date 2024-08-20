@@ -21,7 +21,7 @@ public class GameClient extends Thread {
 	// 12345 - port serverskog rutera za slusanje udp paketa koji se salju na server
 	private int serverPort;
 	// 12346 - port serverskog rutera za slusanje udp paketa koji se salju na battleThread
-	private int battlePort;
+//	private int battlePort;
 	// 79.175.76.229 - ip adresa serverskog rutera
 	private InetAddress serverAddress;
 	
@@ -31,8 +31,7 @@ public class GameClient extends Thread {
 	public GameClient(GamePanel gp, String serverAddress, int serverPort, int battlePort) {
 		this.gp = gp;
 		this.serverPort = serverPort;
-		this.battlePort = battlePort;
-		
+//		this.battlePort = battlePort;
 		try {
 			
 			this.socket = new DatagramSocket();
@@ -48,6 +47,9 @@ public class GameClient extends Thread {
 	public void run() {
 		// Receive data
 		while (true) {
+			
+			System.out.println("[CLIENT] Waiting on a packet...");
+			
 			byte[] data = new byte[1024];
 			DatagramPacket packet = new DatagramPacket(data, data.length);
 			try {
@@ -67,20 +69,61 @@ public class GameClient extends Thread {
 			int packetPort = packet.getPort();
 			
 			switch (packetType) {
-				
+				case GameServer.youWinPacket: {
+					// TODO: YOU WIN! SCREEN
+					// gp.gameState = GamePanel.winState;
+					// azuriraj da je igrac onlajn kada klikne opciju 
+					// back to menu ili oflajn ako exituje
+					System.out.println("You win!");
+					break;
+				}
+				case GameServer.stopEnemyProjectilePacket: {
+					gp.enemy.enemyProjectile.alive = false;
+					if (dataString.trim().equalsIgnoreCase("0")) {
+						gp.player.hp -= gp.enemy.enemyProjectile.attack;
+						if (gp.player.hp <= 0) {
+							// TODO: YOU LOSE! SCREEN
+							// gp.gameState = GamePanel.loseState;
+							// nema pomeranja
+							// siv ekran koji prekriva dosadasnju mapu
+							// opcije:
+							// exit to main menu - gp.gameState = playState;
+							// exit to desktop 
+							// azuriraj da je igrac onlajn kada klikne opciju 
+							// back to menu ili oflajn ako exituje
+							sendDataToServer(GameServer.youWinPacket, "youWin");
+							System.out.println("You lost!");
+						}
+					}
+					break;
+				}
+				case GameServer.createEnemyProjectilePacket: {
+					String[] projectileInfo = dataString.split(":");
+					int x = Integer.parseInt(projectileInfo[0]);
+					int y = Integer.parseInt(projectileInfo[1]);
+					String dir = projectileInfo[2].trim();
+					
+					gp.enemy.enemyProjectile.set(x, y, dir, true, gp.enemy);
+					gp.projectileList.add(gp.enemy.enemyProjectile);
+					break;
+				}
 				case GameServer.changeDirectionPacket: {
 					System.out.println("Primljen paket: " + message);
+					gp.enemy.spriteNum++;
+					if (gp.enemy.spriteNum > 2) {
+						gp.enemy.spriteNum = 1;
+					}
 					if (dataString.trim().equalsIgnoreCase(GameServer.upDir)) {
 						gp.enemy.direction = "up";
 					}
 					if (dataString.trim().equalsIgnoreCase(GameServer.downDir)) {
-						gp.enemy.direction = "left";
+						gp.enemy.direction = "down";
 					}
 					if (dataString.trim().equalsIgnoreCase(GameServer.leftDir)) {
-						gp.enemy.direction = "right";
+						gp.enemy.direction = "left";
 					}
 					if (dataString.trim().equalsIgnoreCase(GameServer.rightDir)) {
-						gp.enemy.direction = "down";
+						gp.enemy.direction = "right";
 					}
 					break;
 				}
@@ -100,6 +143,13 @@ public class GameClient extends Thread {
 					}
 					break;
 				}
+				case GameServer.damageTilePacket: {
+					String[] tileInfo = dataString.split(":");
+					int row = Integer.parseInt(tileInfo[0]);
+					int col = Integer.parseInt(tileInfo[1]);
+					int num = Integer.parseInt(tileInfo[2]);
+					gp.tileM.mapTileNums[row][col] = num; 
+				}
 //				case GameServer.stopPacket: {
 //					gp.enemy.moved_up = false;
 //					gp.enemy.moved_down = false;
@@ -107,7 +157,6 @@ public class GameClient extends Thread {
 //					gp.enemy.moved_right = false;
 //					break;
 //				}
-				
 				case GameServer.testPacket: {
 					System.out.println("SERVER [" + packetIp + ":" + packetPort + "] > " + dataString);
 					break;
@@ -153,7 +202,6 @@ public class GameClient extends Thread {
 					}
 					
 					System.out.println("[CLIENT] response: " + responseYes.toString().trim());
-					
 					sendDataToServer(GameServer.responsePacket, responseYes.toString().trim());
 					
 					break;
@@ -189,7 +237,6 @@ public class GameClient extends Thread {
 					break;
 				}
 			}
-			data = null;
 		}
 			
 	}
@@ -206,16 +253,16 @@ public class GameClient extends Thread {
 		}
 	}
 	
-	public void sendDataToBattleThread(String packetType, String data) {
-		String dataString = packetType + ":" + data;
-		byte[] dataByte = dataString.getBytes();
-		DatagramPacket packet = new DatagramPacket(dataByte, dataByte.length, serverAddress, battlePort);
-		System.out.println("Paket u sendData-gameClient: " + dataString);
-		try {
-			socket.send(packet);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	public void sendDataToBattleThread(String packetType, String data) {
+//		String dataString = packetType + ":" + data;
+//		byte[] dataByte = dataString.getBytes();
+//		DatagramPacket packet = new DatagramPacket(dataByte, dataByte.length, serverAddress, battlePort);
+//		System.out.println("Paket u sendData-gameClient: " + dataString);
+//		try {
+//			socket.send(packet);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 }

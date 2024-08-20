@@ -1,6 +1,7 @@
 package entity;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -41,6 +42,8 @@ public class Entity{
 	int dyingCounter = 0;
 		
 	// Podesavanja kolizije
+	public int solidAreaDefaultX;
+	public int solidAreaDefaultY;
 	public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
 	public boolean collisionOn = false;
 	public boolean collision = false;	
@@ -51,6 +54,12 @@ public class Entity{
 
 	// Konstruktor
 	public Entity(GamePanel gp) {
+		// Zivoti i hp
+		maxLife = 3;
+		life = maxLife;
+		maxHp = 48;
+		hp = maxHp;
+		
 		this.gp = gp;
 	}
 	
@@ -106,6 +115,17 @@ public class Entity{
 			
 			if(dying == true) {
 				dyingAnimation(g2);
+			}
+			
+			if (this instanceof EnemyPlayer) {
+				
+				double oneScale = (double)GamePanel.tileSize/maxHp;
+				double hpBarValue = oneScale*hp;
+				
+				g2.setColor(new Color(35, 35, 35));
+				g2.fillRect(screenX - 1, screenY - 16, GamePanel.tileSize + 2, 12);;
+				g2.setColor(new Color(255, 0, 30));
+				g2.fillRect(screenX, screenY - 15, (int)hpBarValue, 10);
 			}
 			
 			g2.drawImage(image, screenX, screenY, GamePanel.tileSize, GamePanel.tileSize, null);

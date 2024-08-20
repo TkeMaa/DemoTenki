@@ -30,6 +30,8 @@ public class Player extends Entity{
 		
 		// Oblast kolizije
 		solidArea = new Rectangle();
+		solidAreaDefaultX = 12;
+		solidAreaDefaultY = 12;
 		solidArea.x = 12;
 		solidArea.y = 12;
 		solidArea.width = 26;
@@ -116,6 +118,9 @@ public class Player extends Entity{
 			
 			double oneScale = (double)GamePanel.tileSize/maxHp;
 			double hpBarValue = oneScale*hp;
+			if (hpBarValue <= 0) {
+				hpBarValue = 0;
+			}
 			
 			g2.setColor(new Color(35, 35, 35));
 			g2.fillRect(screenX - 1, screenY - 16, GamePanel.tileSize + 2, 12);;
@@ -132,7 +137,6 @@ public class Player extends Entity{
 		// SOBZIROM DA JE DEFAULT POZICIJA "DOLE".
 		// IGRAC SE POMERA SAMO U KOLIKO SE KONTINUALNO PRITISKAJU DUGMICI
 		if (keyH.downPressed || keyH.upPressed || keyH.leftPressed || keyH.rightPressed) {
-			
 			if(keyH.upPressed) {
 				direction = "up";
 			}
@@ -146,21 +150,25 @@ public class Player extends Entity{
 				direction = "right";
 			}
 			// Posalji na battleThread smer
-			gp.socketClient.sendDataToBattleThread(GameServer.changeDirectionPacket, direction);
-			
+			gp.socketClient.sendDataToServer(GameServer.changeDirectionPacket, direction);
 			// Animacija
 			spriteNum++;
 			if (spriteNum > 2) {
 				spriteNum = 1;
 			}
-			
 			// Proveravamo koliziju
 			collisionOn = false;
+			
+			// ENEMY PLAYER COLLISION
+			gp.cChecker.checkEnemyCollision(this);
+			// TILE COLLISION
 			gp.cChecker.checkTile(this);
 			
 			// Ako nema kolizije u odredjenom smeru, igrac moze da se krece 
 			if (!collisionOn) {
-				gp.socketClient.sendDataToBattleThread(GameServer.movePacket, direction);
+				
+				gp.socketClient.sendDataToServer(GameServer.movePacket, direction);
+				
 				switch (direction) {
 				case "up":
 					worldY -= speed;
@@ -177,16 +185,14 @@ public class Player extends Entity{
 				}
 			}
 		}
-		
 		// Projektil moze da se ispali samo ukoliko je prethodni nestao i ako je isteklo vreme punjenja
 		if (gp.keyH.shootKeyPressed && !projectile.alive && projectile.readyToFire) {
 			
+			gp.socketClient.sendDataToServer(GameServer.createEnemyProjectilePacket, worldX + ":" + worldY + ":" + direction);
 			// Postavljamo default parametre za projektil 
 			// U set metodi se ready parametar za projektil postavlja na false
 			projectile.set(worldX, worldY, direction, true, this);
-			
 			gp.projectileList.add(projectile);
-			
 			gp.playSE(Sound.shoot, -10.0f);
 		}
 	}
@@ -195,19 +201,26 @@ public class Player extends Entity{
 		switch (gp.tileM.mapTileNums[row][col]) {
 			case TileManager.wall: 
 				gp.playSE(Sound.chipWall, 90.0f);
+				gp.socketClient.sendDataToServer(GameServer.damageTilePacket, String.valueOf(row + ":" + col + ":" + TileManager.wallDamaged1));
 				gp.tileM.mapTileNums[row][col] = TileManager.wallDamaged1;
 				break;
 			case TileManager.wallDamaged1:
 				gp.playSE(Sound.chipWall, 90.0f);
+				gp.socketClient.sendDataToServer(GameServer.damageTilePacket, String.valueOf(row + ":" + col + ":" + TileManager.wallDamaged2));
 				gp.tileM.mapTileNums[row][col] = TileManager.wallDamaged2;
 				break;
 			case TileManager.wallDamaged2:
 				gp.playSE(Sound.chipWall, 90.0f);
+				gp.socketClient.sendDataToServer(GameServer.damageTilePacket, String.valueOf(row + ":" + col + ":" + TileManager.sand));
 				gp.tileM.mapTileNums[row][col] = TileManager.sand;
 				break;
 		}
 	}
 
+	public void damageEnemy() {
+		gp.enemy.hp -= gp.player.projectile.attack;
+	}
+	
 	public void setDefaultCoordinates(int row, int col) {
 		this.worldX = row * GamePanel.tileSize;
 		this.worldY = col * GamePanel.tileSize;

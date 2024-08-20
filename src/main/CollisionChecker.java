@@ -1,6 +1,8 @@
 package main;
 
 import entity.Entity;
+import entity.Player;
+import entity.Projectile;
 
 public class CollisionChecker {
 
@@ -12,9 +14,64 @@ public class CollisionChecker {
 	}
 	
 	// Proveri koliziju sa enemy igracem
-	public boolean checkEnemyCollision(Entity entity) {
-		return false;
+	public void checkEnemyCollision(Entity entity) {
 		
+		entity.solidArea.x = entity.worldX + entity.solidArea.x;
+		entity.solidArea.y = entity.worldY + entity.solidArea.y;
+		
+		gp.enemy.solidArea.x= gp.enemy.worldX + gp.enemy.solidArea.x;
+		gp.enemy.solidArea.y = gp.enemy.worldY + gp.enemy.solidArea.y;
+		
+		switch(entity.direction) {
+		case "up":
+			entity.solidArea.y -= entity.speed;
+			if (entity.solidArea.intersects(gp.enemy.solidArea)) {
+				if (entity instanceof Player) {
+					((Player) entity).collisionOn = true;
+				}
+				if (entity instanceof Projectile) {
+					((Projectile) entity).hitEnemy = true;
+				}
+			}
+			break;
+		case "down": 
+			entity.solidArea.y += entity.speed;
+			if (entity.solidArea.intersects(gp.enemy.solidArea)) {
+				if (entity instanceof Player) {
+					((Player) entity).collisionOn = true;
+				}
+				if (entity instanceof Projectile) {
+					((Projectile) entity).hitEnemy = true;
+				}
+			}
+			break;
+		case "left": 
+			entity.solidArea.x -= entity.speed;
+			if (entity.solidArea.intersects(gp.enemy.solidArea)) {
+				if (entity instanceof Player) {
+					((Player) entity).collisionOn = true;
+				}
+				if (entity instanceof Projectile) {
+					((Projectile) entity).hitEnemy = true;
+				}
+			}
+			break;
+		case "right": 
+			entity.solidArea.x += entity.speed;
+			if (entity.solidArea.intersects(gp.enemy.solidArea)) {
+				if (entity instanceof Player) {
+					((Player) entity).collisionOn = true;
+				}
+				if (entity instanceof Projectile) {
+					((Projectile) entity).hitEnemy = true;
+				}
+			}
+			break;
+		}
+		entity.solidArea.x = entity.solidAreaDefaultX;
+		entity.solidArea.y = entity.solidAreaDefaultY;
+		gp.enemy.solidArea.x = gp.enemy.solidAreaDefaultX;
+		gp.enemy.solidArea.y = gp.enemy.solidAreaDefaultY;
 	}
 	
 	public int[] checkTile(Entity entity) {

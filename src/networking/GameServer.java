@@ -42,12 +42,21 @@ public class GameServer extends Thread {
 		public static final String movedLeft = "left";
 		public static final String movedRight = "right";
 		
-//	public static final String stopPacket = "09";
-//		public static final String stop = "stop";
+	public static final String damageTilePacket = "09"; // 09:row:col:imgNum
+	
+	public static final String createEnemyProjectilePacket = "10"; // 10:x:y:dir
+	public static final String stopEnemyProjectilePacket = "11"; // 11:hitEnemy(0 - true, 1 - false)
+	
+	public static final String youWinPacket = "12"; // 12:
+		
+	public boolean battleRunning = false;
 		
 	private DatagramSocket socket;
 	private GamePanel gp;
 	private final int portNum = 5000;
+	
+	public OnlineUser player1 = null;
+	public OnlineUser player2 = null;
 	
 	public List<OnlineUser> onlineUsers;
 	public Thread battleThread;
@@ -107,7 +116,54 @@ public class GameServer extends Thread {
 			int packetPort = packet.getPort();
 			
 			// Proveravamo prve dve cifre primljenog paketa kako bismo utvrdili njegov tip
-			switch (packetType) {
+			if (battleRunning) {
+				String destIp = null;
+				int destPort = 0;
+				
+				if (packetPort == player1.getPort()) {
+					destPort = player2.getPort();
+				} else {
+					destPort = player1.getPort();
+				}
+				
+				if (packetIp.trim().equalsIgnoreCase(player1.getIpAddress().trim())) {
+					destIp = player2.getIpAddress().trim();
+				} else {
+					destIp = player1.getIpAddress().trim();
+				}
+				
+				System.out.println("Packet received from: " + packetIp + "|" + packetPort);
+				
+				// Proveravamo prve dve cifre primljenog paketa kako bismo utvrdili njegov tip
+				switch (packetType) {
+					case GameServer.changeDirectionPacket: {
+						sendData(GameServer.changeDirectionPacket, dataString.trim(), destIp, destPort);
+						break;	
+					}
+					case GameServer.movePacket: {
+						sendData(GameServer.movePacket, dataString.trim(), destIp, destPort);
+						break;
+					}
+					case GameServer.damageTilePacket: {
+						sendData(GameServer.damageTilePacket, dataString.trim(), destIp, destPort);
+						break;
+					}
+					case GameServer.createEnemyProjectilePacket: {
+						sendData(GameServer.createEnemyProjectilePacket, dataString.trim(), destIp, destPort);
+						break;
+					}
+					case GameServer.stopEnemyProjectilePacket: {
+						sendData(GameServer.stopEnemyProjectilePacket, dataString.trim(), destIp, destPort);
+						break;
+					}
+					case GameServer.youWinPacket: {
+						sendData(GameServer.youWinPacket, dataString.trim(), destIp, destPort);
+						battleRunning = false;
+						break;
+					}
+				}
+			} else {
+				switch (packetType) {
 				// 00
 				// Ubaci korisnika u listu onlineUsers:
 				case GameServer.loginPacket: {
@@ -165,12 +221,21 @@ public class GameServer extends Thread {
 										pom.getPort());
 						}
 					} else {
-						BattleThread battleThread = new BattleThread(getOnlineUserByUsername(responseTo), getOnlineUserByUsername(responseFrom), this);
-						battleThread.start();
+						
+						player1 = getOnlineUserByUsername(responseTo);
+						player2 = getOnlineUserByUsername(responseFrom);
+						
+						battleRunning = true;
+						
+						sendData(GameServer.setInBattleRowColsPacket, GameServer.player1Coordinates, player1.getIpAddress(), player1.getPort());
+						sendData(GameServer.setInBattleRowColsPacket, GameServer.player2Coordinates, player2.getIpAddress(), player2.getPort());
+						
 					}
 					break;
 				}
-				
+			}
+			
+			
 			}
 			
 		}
@@ -186,7 +251,7 @@ public class GameServer extends Thread {
 		}
 		
 		String dataString = (packetType + ":" + data).trim();
-		System.out.println("Paket u sendData-gameServer: " + dataString);
+		System.out.println("Paket u sendData-gameServer: " + dataString + "\nSending data to: " + inetAddress.getHostAddress() + " | " + port);
 		
 		byte[] dataByte = dataString.getBytes();
 		

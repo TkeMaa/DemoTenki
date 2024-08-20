@@ -5,21 +5,26 @@ import java.awt.Rectangle;
 
 import main.GamePanel;
 import main.Sound;
+import networking.GameServer;
 
 public class Projectile extends Entity{
 	
-	Entity user;
-	GamePanel gp;
-	Graphics2D g2;	
+	public Entity user;
+	public GamePanel gp;
+	public Graphics2D g2;	
+	
 	public boolean readyToFire;
+	public boolean hitEnemy;
 	
 	public Projectile(GamePanel gp) {
 		super(gp);
 		this.gp = gp;
 		
 		solidArea = new Rectangle(24, 24, 1, 1);
+		solidAreaDefaultX = 24;
+		solidAreaDefaultY = 24;
 		speed = 10;
-		attack = 2;
+		attack = 12;
 		alive = false;
 		maxLife = 90;
 		life = maxLife;
@@ -83,14 +88,26 @@ public class Projectile extends Entity{
 		int[] hitCoordinates = new int[2];
 		if (user == gp.player) {
 			hitCoordinates = gp.cChecker.checkTile(this);
+			gp.cChecker.checkEnemyCollision(this);
 		}
 		if (collisionOn) {
+			
+			gp.socketClient.sendDataToServer(GameServer.stopEnemyProjectilePacket, "1");
 			alive = false;
 			collisionOn = false;
 			System.out.println("===================================================================");
 			System.out.println("Damaged row: " + hitCoordinates[0] + "\nDamaged col: " + hitCoordinates[1]);
 			System.out.println("===================================================================");
 			gp.player.damageWall(hitCoordinates[0], hitCoordinates[1]);
+			
+		} else if (hitEnemy) {
+			
+			gp.socketClient.sendDataToServer(GameServer.stopEnemyProjectilePacket, "0");
+			System.out.println("Protivnik pogodjen!");
+			alive = false;
+			hitEnemy = false;
+			gp.player.damageEnemy();
+			
 		} else {
 			switch (direction) {
 				case "up": worldY -= speed; break;

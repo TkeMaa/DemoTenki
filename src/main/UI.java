@@ -107,6 +107,14 @@ public class UI {
 		}
 	}
 	
+	public void drawWinScreen() {
+		
+	}
+	
+	public void drawLoseScreen() {
+		
+	}
+	
 	public void drawPlayScreen() {
 		
 		// BACKGROUND
@@ -316,5 +324,13 @@ public class UI {
 				drawReadyToShoot();	
 			}
 		}
+//		// WIN STATE
+//		if (gp.gameState == GamePanel.winState) {
+//			drawWinScreen();
+//		}
+//		// LOSE STATE
+//		if (gp.gameState == GamePanel.loseState) {
+//			drawLoseScreen();
+//		}
 	}	
 }

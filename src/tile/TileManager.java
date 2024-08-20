@@ -37,9 +37,7 @@ public class TileManager {
 	public void getTileImage() {
 
 		setup(0, "sand", false);
-		
 		setup(2, "wall_unbreakable", true);
-		
 		setup(1, "wall", true);	
 		setup(3, "wall_damaged1", true);
 		setup(4, "wall_damaged2", true);
